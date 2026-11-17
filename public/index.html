@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System - Solusi Absensi Modern</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --warning: #d97706;
+            --error: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --accent-red: #ef4444;
+        }
+
+        body {
+            background: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--primary);
+            color: white;
+            padding: 8px 0;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* Header Navigation */
+        .header {
+            background: white;
+            padding: 16px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+
+        .btn-sign-in {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sign-in:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.95) 0%, rgba(37, 99, 235, 0.9) 50%, rgba(99, 102, 241, 0.85) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23334155" width="1200" height="600"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            padding: 0 24px;
+        }
+
+        .hero-content h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            margin-bottom: 32px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .btn-cta {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-cta:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Section Wrapper */
+        .section {
+            padding: 80px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-subtitle {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 32px 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            background: var(--background);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .feature-icon img {
+            width: 36px;
+            height: 36px;
+            filter: brightness(0) invert(1);
+        }
+
+        .feature-card:first-child .feature-icon {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.25);
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Feature Details */
+        .feature-detail {
+            background: var(--background);
+            border-radius: 16px;
+            padding: 40px;
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .feature-detail-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .feature-detail-icon img {
+            width: 40px;
+            height: 40px;
+            filter: brightness(0) invert(1);
+        }
+
+        .feature-detail-content h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-detail-content p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .btn-learn {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Solutions Grid */
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .solution-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .solution-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+
+        .solution-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        .solution-content {
+            padding: 24px;
+        }
+
+        .solution-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .solution-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .solution-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* Modal System */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 540px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .nav {
+            display: flex;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .nav button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav button.active {
+            color: var(--primary);
+            font-weight: 600;
+            background: var(--surface);
+        }
+
+        .nav button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .method-card {
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .method-card:hover {
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+        }
+
+        .method-card.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .method-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .method-icon-small {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
+            background: var(--surface);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+        }
+
+        .method-title-small {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .scanner-container {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: var(--background);
+            margin-bottom: 20px;
+        }
+
+        .video-box {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .video-box canvas {
+            display: none;
+        }
+
+        .face-target {
+            position: absolute;
+            width: 140px;
+            height: 170px;
+            border: 2px dashed rgba(59, 130, 246, 0.8);
+            border-radius: 50% 50% 45% 45%;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+        }
+
+        .scan-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #3b82f6;
+            box-shadow: 0 0 10px #3b82f6;
+            animation: scanMove 2s infinite ease-in-out;
+            display: none;
+        }
+
+        @keyframes scanMove {
+            0% { top: 15%; opacity: 0.2; }
+            50% { top: 85%; opacity: 1; }
+            100% { top: 15%; opacity: 0.2; }
+        }
+
+        .fingerprint-touch-area {
+            width: 120px;
+            height: 120px;
+            margin: 15px auto;
+            background: #eff6ff;
+            border: 2px dashed var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 54px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .fingerprint-touch-area:hover {
+            transform: scale(1.05);
+            background: #dbeafe;
+        }
+
+        .fingerprint-touch-area.scanning {
+            animation: pulseSensor 1s infinite alternate;
+        }
+
+        @keyframes pulseSensor {
+            from { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            to { box-shadow: 0 0 0 16px rgba(37, 99, 235, 0); }
+        }
+
+        .card-rfid-area {
+            padding: 24px 16px;
+            background: #eff6ff;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-rfid-area:hover {
+            background: #dbeafe;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn:disabled {
+            background: var(--secondary);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            margin-top: 8px;
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: rgba(37, 99, 235, 0.05);
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .alert.success {
+            background: rgba(22, 163, 74, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(22, 163, 74, 0.25);
+        }
+
+        .alert.error {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(220, 38, 38, 0.25);
+        }
+
+        .alert.warning {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(217, 119, 6, 0.25);
+        }
+
+        .result-box {
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-box.error-res {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .result-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .result-content {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .log-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-primary { background: #dbeafe; color: #1d4ed8; }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 36px;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+
+            .features-grid,
+            .solutions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-detail {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        ✨ Sistem Absensi Modern dengan AI Face Recognition • Fingerprint • RFID Support
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                📱 AttendanceX
+            </div>
+            <nav class="nav-menu">
+                <a href="#features">Features</a>
+                <a href="#solutions">Solutions</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <button class="btn-sign-in" onclick="openSystemModal()">Access System</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Attendance & HR Solutions</h1>
+            <p>Sistem absensi multi-metode untuk perusahaan modern</p>
+            <button class="btn-cta" onclick="openSystemModal()">Start Attendance Now</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="section-header">
+            <div class="section-subtitle">Your Complete Solution</div>
+            <h2 class="section-title">All-in-one attendance and HR<br>for your business</h2>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card" onclick="openSystemModal()">
+                <div class="feature-icon">
+                    <img src="/assets/time.svg" alt="Time & Attendance">
+                </div>
+                <div class="feature-title">Time & Attendance</div>
+                <div class="feature-desc">Track employee attendance with real-time verification</div>
+            </div>
+            <div class="feature-card" onclick="openSystemModal()">
+                <div class="feature-icon">
+                    <img src="/assets/face.svg" alt="Face Recognition">
+                </div>
+                <div class="feature-title">Face Recognition</div>
+                <div class="feature-desc">AI-powered face scanning for secure authentication</div>
+            </div>
+            <div class="feature-card" onclick="openSystemModal()">
+                <div class="feature-icon">
+                    <img src="/assets/fingerprint.svg" alt="Fingerprint">
+                </div>
+                <div class="feature-title">Fingerprint</div>
+                <div class="feature-desc">Biometric fingerprint verification system</div>
+            </div>
+            <div class="feature-card" onclick="openSystemModal()">
+                <div class="feature-icon">
+                    <img src="/assets/card.svg" alt="RFID / Card">
+                </div>
+                <div class="feature-title">RFID / Card</div>
+                <div class="feature-desc">Support for RFID card and NFC technology</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img src="/assets/reports.svg" alt="Real-time Reports">
+                </div>
+                <div class="feature-title">Real-time Reports</div>
+                <div class="feature-desc">Live monitoring and comprehensive analytics</div>
+            </div>
+        </div>
+
+        <!-- Feature Detail -->
+        <div class="feature-detail">
+            <div class="feature-detail-icon">
+                <img src="/assets/time.svg" alt="Time" style="width: 40px; height: 40px; filter: brightness(0) saturate(0) invert(24%) sepia(89%) saturate(2837%) hue-rotate(216deg) brightness(94%) contrast(96%);">
+            </div>
+            <div class="feature-detail-content">
+                <h3>Time & Attendance Management</h3>
+                <p>Kelola waktu dan kehadiran karyawan dengan mudah. Sistem multi-metode kami mendukung face recognition, fingerprint, dan RFID untuk fleksibilitas maksimal. Data tersimpan otomatis ke database MySQL dengan enkripsi penuh.</p>
+                <a href="javascript:void(0)" class="btn-learn" onclick="openSystemModal()">Try it now →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solutions Section -->
+    <section class="section" id="solutions" style="background: var(--background);">
+        <div class="section-header">
+            <div class="section-subtitle">Solutions for Every Size</div>
+            <h2 class="section-title">HR solutions that grow with<br>your business</h2>
+        </div>
+
+        <div class="solutions-grid">
+            <div class="solution-card" onclick="openSystemModal()">
+                <div class="solution-img">👥</div>
+                <div class="solution-content">
+                    <div class="solution-badge">For 1-5 employees</div>
+                    <h3 class="solution-title">Small Business Solution</h3>
+                    <p class="solution-desc">Perfect untuk startup dan usaha kecil. Single device support dengan cloud backup.</p>
+                    <a href="#" class="btn-learn" onclick="event.stopPropagation(); openSystemModal(); return false;">Learn more →</a>
+                </div>
+            </div>
+
+            <div class="solution-card" onclick="openSystemModal()">
+                <div class="solution-img">🏢</div>
+                <div class="solution-content">
+                    <div class="solution-badge">For 20-49 employees</div>
+                    <h3 class="solution-title">Mid-size Company</h3>
+                    <p class="solution-desc">Multi-device sync, advanced reporting, dan integrasi payroll system.</p>
+                    <a href="#" class="btn-learn" onclick="event.stopPropagation(); openSystemModal(); return false;">Learn more →</a>
+                </div>
+            </div>
+
+            <div class="solution-card" onclick="openSystemModal()">
+                <div class="solution-img">🏭</div>
+                <div class="solution-content">
+                    <div class="solution-badge">For 50-100 employees</div>
+                    <h3 class="solution-title">Enterprise Solution</h3>
+                    <p class="solution-desc">Full-featured dengan multi-lokasi, custom rules, dan dedicated support.</p>
+                    <a href="#" class="btn-learn" onclick="event.stopPropagation(); openSystemModal(); return false;">Learn more →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Modal -->
+    <div class="modal" id="system-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-size: 20px; margin-bottom: 4px;">Attendance System</h2>
+                    <p style="font-size: 13px; opacity: 0.9;">Face • Fingerprint • Card/RFID</p>
+                </div>
+                <button class="modal-close" onclick="closeSystemModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="alert-container"></div>
+
+                <div class="nav">
+                    <button class="active" id="nav-login" onclick="switchTab('login')">Attendance</button>
+                    <button id="nav-register" onclick="switchTab('register')">Register</button>
+                    <button id="nav-monitor" onclick="switchTab('monitor')">Monitor</button>
+                </div>
+
+                <!-- TAB 1: ATTENDANCE -->
+                <div id="tab-login" class="tab-content active">
+                    <div class="form-group">
+                        <label style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Username</span>
+                            <label style="font-size: 12px; font-weight: 400; cursor: pointer;">
+                                <input type="checkbox" id="auto-identify-mode" onchange="toggleAutoIdentifyMode()">
+                                Auto-Identify
+                            </label>
+                        </label>
+                        <input type="text" id="att-username" placeholder="Enter your username (or enable auto-identify)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pilih Metode</label>
+                        <div class="method-grid" id="login-methods">
+                            <div class="method-card selected" onclick="chooseLoginMethod('face')" data-method="face">
+                                <div class="method-icon-small">👤</div>
+                                <div class="method-title-small">Face</div>
+                            </div>
+                            <div class="method-card" onclick="chooseLoginMethod('fingerprint')" data-method="fingerprint">
+                                <div class="method-icon-small">🔍</div>
+                                <div class="method-title-small">Fingerprint</div>
+                            </div>
+                            <div class="method-card" onclick="chooseLoginMethod('card')" data-method="card">
+                                <div class="method-icon-small">💳</div>
+                                <div class="method-title-small">Card</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scanner-container">
+                        <!-- Face View -->
+                        <div id="view-face">
+                            <h4 style="color: var(--text-primary); font-size: 14px;">Face Scanner</h4>
+                            <div class="video-box">
+                                <video id="video-stream" autoplay playsinline muted></video>
+                                <canvas id="photo-canvas"></canvas>
+                                <div class="face-target"></div>
+                                <div class="scan-laser" id="face-laser"></div>
+                                <div id="face-status" style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; display: none;">Looking for face...</div>
+                                <div id="countdown-overlay" style="position: absolute; inset: 0; background: rgba(37, 99, 235, 0.1); display: none; align-items: center; justify-content: center; font-size: 64px; font-weight: 800; color: var(--primary); text-shadow: 0 2px 8px rgba(0,0,0,0.3);">3</div>
+                                <div id="camera-fallback" style="display:none; color: #94a3b8; font-size: 13px; padding: 20px;">
+                                    📷 Camera inactive<br>
+                                    <button class="btn btn-outline" style="width: auto; padding: 6px 14px; margin: 10px auto;" onclick="initWebcam()">Enable Camera</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                                <button class="btn btn-outline" style="flex: 1; margin: 0;" onclick="startAutoScan()">🎯 Auto Scan</button>
+                                <button class="btn btn-outline" style="flex: 1; margin: 0;" onclick="manualCapture()">📸 Capture Now</button>
+                            </div>
+                        </div>
+
+                        <!-- Fingerprint View -->
+                        <div id="view-fingerprint" style="display: none;">
+                            <h4 style="color: var(--text-primary); font-size: 14px;">Fingerprint Scanner</h4>
+                            <div class="fingerprint-touch-area" id="fp-sensor" onclick="simulateFingerprintTap()">🔍</div>
+                            <p id="fp-status-text" style="font-size: 12px; color: var(--text-secondary);">Tap to scan</p>
+                        </div>
+
+                        <!-- Card View -->
+                        <div id="view-card" style="display: none;">
+                            <h4 style="color: var(--text-primary); font-size: 14px;">RFID / Card Reader</h4>
+                            <div class="card-rfid-area" onclick="simulateCardTap()">
+                                <div style="font-size: 40px; margin-bottom: 6px;">💳</div>
+                                <strong style="color: var(--primary); font-size: 14px;">Tap Card Here</strong>
+                                <div id="rfid-uid-preview" style="font-family: monospace; font-size: 13px; color: var(--text-secondary); margin-top: 4px;">UID: CARD_9F2A48D1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn" id="btn-perform-attendance" onclick="submitAttendance()">
+                        <span id="btn-text">Record Attendance</span>
+                    </button>
+
+                    <div class="result-box" id="attendance-result">
+                        <div class="result-title" id="result-title">✅ Success</div>
+                        <div class="result-content" id="result-details"></div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: REGISTER -->
+                <div id="tab-register" class="tab-content">
+                    <div class="form-group">
+                        <label for="reg-name">Full Name *</label>
+                        <input type="text" id="reg-name" placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-username">Username *</label>
+                        <input type="text" id="reg-username" placeholder="johndoe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-email">Email (Optional)</label>
+                        <input type="email" id="reg-email" placeholder="john@company.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-password">Password (Optional)</label>
+                        <input type="password" id="reg-password" placeholder="Default: 123456">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Enabled Methods</label>
+                        <div class="method-grid" id="register-methods">
+                            <div class="method-card selected" onclick="toggleRegMethod('face')" data-reg-method="face">
+                                <div class="method-icon-small">👤</div>
+                                <div class="method-title-small">Face</div>
+                            </div>
+                            <div class="method-card selected" onclick="toggleRegMethod('fingerprint')" data-reg-method="fingerprint">
+                                <div class="method-icon-small">🔍</div>
+                                <div class="method-title-small">Fingerprint</div>
+                            </div>
+                            <div class="method-card selected" onclick="toggleRegMethod('card')" data-reg-method="card">
+                                <div class="method-icon-small">💳</div>
+                                <div class="method-title-small">Card</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Face Enrollment Section -->
+                    <div id="face-enrollment-section" style="background: var(--background); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 10px;">Face Enrollment</label>
+                        <div class="video-box" style="height: 180px;">
+                            <video id="reg-video" autoplay playsinline muted></video>
+                            <canvas id="reg-canvas" style="display:none;"></canvas>
+                            <div id="reg-face-status" style="position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.75); color: white; padding: 4px 12px; border-radius: 16px; font-size: 11px; font-weight: 600; display: none;">Position your face</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button class="btn btn-outline" style="flex:1; margin:0; padding: 8px;" onclick="startRegCamera()">📷 Start Camera</button>
+                            <button class="btn" style="flex:1; margin:0; padding: 8px;" id="btn-capture-face-reg" onclick="captureFaceForRegistration()" disabled>🎯 Capture Face</button>
+                        </div>
+                        <div id="face-enrollment-status" style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);"></div>
+                    </div>
+
+                    <!-- Card Enrollment Section -->
+                    <div id="card-enrollment-section" style="display:none; background: var(--background); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 10px;">Card Enrollment</label>
+                        <input type="text" id="reg-card-uid" placeholder="Tap card or enter UID manually" style="width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">Tap RFID card on reader or type UID</div>
+                    </div>
+
+                    <!-- Fingerprint Enrollment Section -->
+                    <div id="fingerprint-enrollment-section" style="display:none; background: var(--background); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 10px;">Fingerprint Enrollment</label>
+                        <input type="text" id="reg-fingerprint" placeholder="Scan fingerprint or enter template ID" style="width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 14px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">Place finger on scanner</div>
+                    </div>
+
+                    <button class="btn" id="btn-register-user" onclick="submitRegistration()">
+                        <span>Register New User</span>
+                    </button>
+                </div>
+
+                <!-- TAB 3: MONITOR -->
+                <div id="tab-monitor" class="tab-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 16px;">System Status</h3>
+                        <button class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px; margin: 0;" onclick="refreshMonitorData()">🔄 Refresh</button>
+                    </div>
+
+                    <div style="background: var(--background); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                            <span>Backend API</span>
+                            <span id="mon-server-status" class="badge badge-success">Checking...</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                            <span>Database MySQL</span>
+                            <span id="mon-db-status" class="badge badge-success">Checking...</span>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 14px; margin-bottom: 10px;">Recent Logs</h3>
+                    <div style="background: var(--background); border: 1px solid var(--border); border-radius: 10px; max-height: 220px; overflow-y: auto;" id="logs-container">
+                        <div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentMethod = 'face';
+        let registeredMethodsList = ['face', 'fingerprint', 'card'];
+        let webcamStream = null;
+        let regWebcamStream = null;
+        let faceApiModelsLoaded = false;
+        let enrolledFaceDescriptor = null;
+        let cardUidGenerated = 'CARD_' + Math.floor(10000000 + Math.random() * 90000000).toString(16).toUpperCase();
+
+        // Modal control
+        function openSystemModal() {
+            document.getElementById('system-modal').classList.add('active');
+            if (currentMethod === 'face') initWebcam();
+            checkSystemHealth();
+        }
+
+        function closeSystemModal() {
+            document.getElementById('system-modal').classList.remove('active');
+            stopWebcam();
+        }
+
+        // Close modal on outside click
+        document.getElementById('system-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'system-modal') closeSystemModal();
+        });
+
+        // Tab switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`nav-${tabId}`).classList.add('active');
+
+            if (tabId === 'login' && currentMethod === 'face') {
+                initWebcam();
+            } else {
+                stopWebcam();
+            }
+
+            if (tabId === 'register') {
+                if (regWebcamStream) {
+                    const video = document.getElementById('reg-video');
+                    video.srcObject = regWebcamStream;
+                    video.style.display = 'block';
+                }
+            }
+
+            if (tabId === 'monitor') refreshMonitorData();
+        }
+
+        // Method selection
+        function chooseLoginMethod(method) {
+            currentMethod = method;
+            capturedFaceImage = null; // Reset
+
+            document.querySelectorAll('#login-methods .method-card').forEach(c => {
+                c.classList.toggle('selected', c.getAttribute('data-method') === method);
+            });
+
+            document.getElementById('view-face').style.display = method === 'face' ? 'block' : 'none';
+            document.getElementById('view-fingerprint').style.display = method === 'fingerprint' ? 'block' : 'none';
+            document.getElementById('view-card').style.display = method === 'card' ? 'block' : 'none';
+
+            if (method === 'face') {
+                initWebcam();
+            } else {
+                stopWebcam();
+            }
+
+            document.getElementById('attendance-result').style.display = 'none';
+        }
+
+        function toggleRegMethod(method) {
+            const index = registeredMethodsList.indexOf(method);
+            if (index > -1) {
+                if (registeredMethodsList.length === 1) {
+                    showNotice('Need at least 1 method!', 'warning');
+                    return;
+                }
+                registeredMethodsList.splice(index, 1);
+            } else {
+                registeredMethodsList.push(method);
+            }
+
+            document.querySelectorAll('#register-methods .method-card').forEach(c => {
+                const m = c.getAttribute('data-reg-method');
+                c.classList.toggle('selected', registeredMethodsList.includes(m));
+            });
+
+            const faceSec = document.getElementById('face-enrollment-section');
+            const cardSec = document.getElementById('card-enrollment-section');
+            const fpSec = document.getElementById('fingerprint-enrollment-section');
+            if (faceSec) faceSec.style.display = registeredMethodsList.includes('face') ? 'block' : 'none';
+            if (cardSec) cardSec.style.display = registeredMethodsList.includes('card') ? 'block' : 'none';
+            if (fpSec) fpSec.style.display = registeredMethodsList.includes('fingerprint') ? 'block' : 'none';
+        }
+
+        async function startRegCamera() {
+            const video = document.getElementById('reg-video');
+            const statusEl = document.getElementById('reg-face-status');
+            const btnCapture = document.getElementById('btn-capture-face-reg');
+            try {
+                if (regWebcamStream) {
+                    video.srcObject = regWebcamStream;
+                    video.style.display = 'block';
+                    return;
+                }
+                regWebcamStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                video.srcObject = regWebcamStream;
+                video.style.display = 'block';
+                if (statusEl) statusEl.style.display = 'block';
+                if (!faceApiModelsLoaded) {
+                    if (statusEl) statusEl.textContent = 'Loading models...';
+                    const M = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
+                    await Promise.all([
+                        faceapi.nets.tinyFaceDetector.loadFromUri(M),
+                        faceapi.nets.faceLandmark68Net.loadFromUri(M),
+                        faceapi.nets.faceRecognitionNet.loadFromUri(M)
+                    ]);
+                    faceApiModelsLoaded = true;
+                }
+                if (statusEl) statusEl.textContent = 'Ready';
+                btnCapture.disabled = false;
+            } catch (err) {
+                console.error('Reg camera:', err);
+                if (statusEl) statusEl.textContent = 'Camera error';
+            }
+        }
+
+        async function captureFaceForRegistration() {
+            const video = document.getElementById('reg-video');
+            const statusText = document.getElementById('face-enrollment-status');
+            const regStatusEl = document.getElementById('reg-face-status');
+            if (!regWebcamStream || video.videoWidth === 0) {
+                showNotice('Start camera first!', 'error');
+                return;
+            }
+            try {
+                if (regStatusEl) regStatusEl.textContent = 'Analyzing...';
+                const all = await faceapi
+                    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+                if (all.length === 0) {
+                    if (statusText) statusText.textContent = '❌ No face detected';
+                    showNotice('No face found!', 'error');
+                    return;
+                }
+                if (all.length > 1) {
+                    if (statusText) statusText.textContent = `❌ ${all.length} faces - only 1 allowed`;
+                    showNotice('Hanya 1 wajah!', 'error');
+                    return;
+                }
+                enrolledFaceDescriptor = Array.from(all[0].descriptor);
+                if (statusText) statusText.textContent = `✅ Captured (${enrolledFaceDescriptor.length}D)`;
+                if (regStatusEl) regStatusEl.textContent = '✓ Captured';
+                showNotice('Face enrolled!', 'success');
+            } catch (err) {
+                console.error('Capture:', err);
+                if (statusText) statusText.textContent = '❌ ' + err.message;
+                showNotice('Capture failed', 'error');
+            }
+        }
+
+        // Webcam
+        async function initWebcam() {
+            const video = document.getElementById('video-stream');
+            const fallback = document.getElementById('camera-fallback');
+            const laser = document.getElementById('face-laser');
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                if (fallback) fallback.style.display = 'block';
+                return;
+            }
+
+            try {
+                if (webcamStream) {
+                    video.srcObject = webcamStream;
+                    video.style.display = 'block';
+                    if (fallback) fallback.style.display = 'none';
+                    if (laser) laser.style.display = 'block';
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 480 }, height: { ideal: 360 } }
+                });
+                webcamStream = stream;
+                video.srcObject = stream;
+                video.style.display = 'block';
+                if (fallback) fallback.style.display = 'none';
+                if (laser) laser.style.display = 'block';
+            } catch (err) {
+                console.warn('Webcam error:', err.message);
+                if (fallback) fallback.style.display = 'block';
+                if (laser) laser.style.display = 'none';
+                video.style.display = 'none';
+            }
+        }
+
+        function stopWebcam() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+            }
+            const laser = document.getElementById('face-laser');
+            if (laser) laser.style.display = 'none';
+        }
+
+        function captureWebcamFrame() {
+            const video = document.getElementById('video-stream');
+            const canvas = document.getElementById('photo-canvas');
+            if (webcamStream && video.videoWidth > 0) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL('image/jpeg', 0.8);
+            }
+            return 'data:image/jpeg;base64,' + btoa('simulated_face_snapshot_' + Date.now());
+        }
+
+        // Auto scan instant capture
+        let capturedFaceImage = null;
+        let isScanning = false;
+        async function startAutoScan() {
+            const video = document.getElementById('video-stream');
+            if (!webcamStream || video.videoWidth === 0) {
+                showNotice('Camera not ready', 'error');
+                return;
+            }
+
+            if (isScanning) return; // Prevent multiple simultaneous scans
+            isScanning = true;
+
+            const statusEl = document.getElementById('face-status');
+            
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Scanning...';
+            statusEl.style.background = 'rgba(37, 99, 235, 0.9)';
+
+            // Instant capture
+            capturedFaceImage = captureWebcamFrame();
+            
+            statusEl.textContent = '✓ Face captured!';
+            statusEl.style.background = 'rgba(22, 163, 74, 0.9)';
+            
+            showNotice('Face captured! Ready to record.', 'success');
+
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+                isScanning = false;
+            }, 1200);
+        }
+
+        // Manual instant capture
+        function manualCapture() {
+            const video = document.getElementById('video-stream');
+            if (!webcamStream || video.videoWidth === 0) {
+                showNotice('Camera not ready', 'error');
+                return;
+            }
+
+            capturedFaceImage = captureWebcamFrame();
+            
+            const statusEl = document.getElementById('face-status');
+            statusEl.style.display = 'block';
+            statusEl.textContent = '✓ Captured!';
+            statusEl.style.background = 'rgba(22, 163, 74, 0.9)';
+            
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 1500);
+
+            showNotice('Face captured!', 'success');
+        }
+
+        // Sensors
+        function simulateFingerprintTap() {
+            const sensor = document.getElementById('fp-sensor');
+            const statusText = document.getElementById('fp-status-text');
+            sensor.classList.add('scanning');
+            statusText.textContent = 'Scanning...';
+            statusText.style.color = 'var(--primary)';
+
+            setTimeout(() => {
+                sensor.classList.remove('scanning');
+                statusText.textContent = 'Verified! Click "Record Attendance"';
+                statusText.style.color = 'var(--success)';
+            }, 600);
+        }
+
+        function simulateCardTap() {
+            cardUidGenerated = 'CARD_' + Math.floor(10000000 + Math.random() * 90000000).toString(16).toUpperCase();
+            updateCardDisplay();
+            showNotice(`Card detected: ${cardUidGenerated}`, 'success');
+        }
+
+        function updateCardDisplay() {
+            const el = document.getElementById('rfid-uid-preview');
+            if (el) el.textContent = 'UID: ' + cardUidGenerated;
+        }
+
+        let autoIdentifyMode = false;
+        function toggleAutoIdentifyMode() {
+            const checkbox = document.getElementById('auto-identify-mode');
+            autoIdentifyMode = checkbox.checked;
+            const usernameInput = document.getElementById('att-username');
+            const usernameLabel = document.querySelector('label[for="att-username"] span');
+            
+            if (autoIdentifyMode) {
+                usernameInput.disabled = true;
+                usernameInput.placeholder = 'System will identify you automatically';
+                usernameLabel.textContent = 'Auto-Identify Mode';
+                usernameLabel.style.color = 'var(--primary)';
+                showNotice('Auto-identify enabled. Scan & attendance will auto-submit.', 'info');
+            } else {
+                usernameInput.disabled = false;
+                usernameInput.placeholder = 'Enter your username';
+                usernameLabel.textContent = 'Username';
+                usernameLabel.style.color = 'inherit';
+            }
+        }
+
+        // Submit attendance (manual or auto)
+        async function submitAttendance() {
+            const usernameInput = document.getElementById('att-username');
+            const username = usernameInput.value.trim();
+            const btn = document.getElementById('btn-perform-attendance');
+            const btnText = document.getElementById('btn-text');
+
+            // Auto-identify mode tidak perlu username
+            if (!autoIdentifyMode && !username) {
+                showNotice('Enter username first!', 'error');
+                usernameInput.focus();
+                return;
+            }
+
+            let verificationPayload = null;
+            if (currentMethod === 'face') {
+                if (!capturedFaceImage) {
+                    showNotice('Capture face first! Click "Auto Scan" or "Capture Now"', 'warning');
+                    return;
+                }
+                verificationPayload = capturedFaceImage;
+            } else if (currentMethod === 'fingerprint') {
+                verificationPayload = 'FP_TEMPLATE_' + username + '_' + Date.now();
+            } else if (currentMethod === 'card') {
+                verificationPayload = cardUidGenerated;
+            }
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Processing...';
+
+            try {
+                // If face method, verify descriptor
+                let verificationPayload = null;
+                if (currentMethod === 'face') {
+                    if (!faceApiModelsLoaded) {
+                        const M = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model';
+                        await Promise.all([
+                            faceapi.nets.tinyFaceDetector.loadFromUri(M),
+                            faceapi.nets.faceLandmark68Net.loadFromUri(M),
+                            faceapi.nets.faceRecognitionNet.loadFromUri(M)
+                        ]);
+                        faceApiModelsLoaded = true;
+                    }
+                    const video = document.getElementById('video-stream');
+                    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+                    
+                    if (!detection) {
+                        showNotice('Face not detected during verification!', 'error');
+                        btn.disabled = false;
+                        btnText.textContent = 'Record Attendance';
+                        return;
+                    }
+                    verificationPayload = Array.from(detection.descriptor);
+                } else if (currentMethod === 'fingerprint') {
+                    verificationPayload = 'FP_TEMPLATE_' + username + '_' + Date.now();
+                } else if (currentMethod === 'card') {
+                    verificationPayload = cardUidGenerated;
+                }
+
+                // Auto-identify: gunakan endpoint /identify tanpa username
+                if (autoIdentifyMode) {
+                    verificationPayload = Array.from(detection.descriptor);
+                    const response = await fetch('/api/attendance/identify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            method: currentMethod,
+                            verificationData: verificationPayload,
+                            deviceId: 'TERMINAL_KIOSK_01'
+                        })
+                    });
+                } else {
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    displayResult(true, `Name: ${data.data.userName} (${data.data.username})\nMethod: ${data.data.method.toUpperCase()}\nTime: ${new Date(data.data.timestamp).toLocaleString('id-ID')}\nStatus: Present`);
+                    showNotice('Attendance recorded!', 'success');
+                } else {
+                    displayResult(false, data.message || 'Failed to record');
+                    showNotice(data.message || 'Verification failed', 'error');
+                }
+            } catch (err) {
+                console.error('Fetch error:', err);
+                displayResult(true, `(Offline Simulation)\nUsername: ${username}\nMethod: ${currentMethod.toUpperCase()}\nTime: ${new Date().toLocaleString('id-ID')}\nNote: Run "npm start" to save to MySQL.`);
+                showNotice('Saved in offline mode', 'warning');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = 'Record Attendance';
+            }
+        }
+
+        // Submit registration
+        async function submitRegistration() {
+            const name = document.getElementById('reg-name').value.trim();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const btn = document.getElementById('btn-register-user');
+
+            if (!name || !username) {
+                showNotice('Name and username required!', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Registering...';
+
+            if (registeredMethodsList.includes('face') && !enrolledFaceDescriptor) {
+                showNotice('Capture face first!', 'warning');
+                btn.disabled = false;
+                btn.innerHTML = '<span>Register New User</span>';
+                return;
+            }
+
+            const cardUid = registeredMethodsList.includes('card') ? 
+                (document.getElementById('reg-card-uid').value.trim() || cardUidGenerated) : null;
+            const fpData = registeredMethodsList.includes('fingerprint') ? 
+                (document.getElementById('reg-fingerprint').value.trim() || `FP_${username}_${Date.now()}`) : null;
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        username: username,
+                        email: email || undefined,
+                        password: password || '123456',
+                        registeredMethods: registeredMethodsList,
+                        faceDescriptor: enrolledFaceDescriptor,
+                        cardUid: cardUid,
+                        fingerprintData: fpData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showNotice(`User "${data.data.name}" registered!`, 'success');
+                    document.getElementById('reg-name').value = '';
+                    document.getElementById('reg-username').value = '';
+                    document.getElementById('reg-email').value = '';
+                    document.getElementById('reg-password').value = '';
+                    document.getElementById('att-username').value = username;
+                    setTimeout(() => switchTab('login'), 1200);
+                } else {
+                    showNotice(data.message || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                showNotice('Failed to connect to backend. Start Node.js server.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Register New User</span>';
+            }
+        }
+
+        // Monitor
+        async function checkSystemHealth() {
+            const monServer = document.getElementById('mon-server-status');
+            const monDb = document.getElementById('mon-db-status');
+
+            try {
+                const res = await fetch('/api/health');
+                if (res.ok) {
+                    const health = await res.json();
+                    if (monServer) {
+                        monServer.className = 'badge badge-success';
+                        monServer.textContent = 'Online';
+                    }
+                    
+                    if (monDb) {
+                        if (health.database === 'connected') {
+                            monDb.className = 'badge badge-success';
+                            monDb.textContent = 'Connected';
+                        } else {
+                            monDb.className = 'badge badge-warning';
+                            monDb.textContent = 'Not Connected';
+                        }
+                    }
+                    return;
+                }
+            } catch (_) {}
+
+            if (monServer) {
+                monServer.className = 'badge badge-warning';
+                monServer.textContent = 'Offline';
+            }
+            if (monDb) {
+                monDb.className = 'badge badge-warning';
+                monDb.textContent = 'Offline';
+            }
+        }
+
+        async function refreshMonitorData() {
+            await checkSystemHealth();
+            const logsContainer = document.getElementById('logs-container');
+
+            try {
+                const res = await fetch('/api/attendance/recent?limit=8');
+                if (res.ok) {
+                    const data = await res.json();
+                    const logs = data.data || [];
+                    if (logs.length === 0) {
+                        logsContainer.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">No attendance records</div>';
+                        return;
+                    }
+
+                    logsContainer.innerHTML = logs.map(l => {
+                        const userName = l.user ? l.user.name : `User #${l.userId}`;
+                        const time = new Date(l.createdAt || l.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        const methodBadge = l.method === 'face' ? '👤 Face' : l.method === 'fingerprint' ? '🔍 Fingerprint' : '💳 Card';
+                        return `
+                            <div class="log-item">
+                                <div>
+                                    <strong>${userName}</strong>
+                                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">${new Date(l.createdAt || l.timestamp).toLocaleDateString('id-ID')} ${time}</div>
+                                </div>
+                                <span class="badge badge-primary">${methodBadge}</span>
+                            </div>
+                        `;
+                    }).join('');
+                    return;
+                }
+            } catch (_) {}
+
+            logsContainer.innerHTML = '<div style="padding: 16px; text-align: center; color: var(--text-secondary); font-size: 13px;">Backend not active</div>';
+        }
+
+        // Helpers
+        function displayResult(success, message) {
+            const box = document.getElementById('attendance-result');
+            const title = document.getElementById('result-title');
+            const details = document.getElementById('result-details');
+
+            box.style.display = 'block';
+            box.className = 'result-box ' + (success ? '' : 'error-res');
+            title.textContent = success ? '✅ Success!' : '❌ Failed';
+            title.style.color = success ? 'var(--success)' : 'var(--error)';
+            details.textContent = message;
+        }
+
+        function showNotice(msg, type = 'success') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = msg;
+            container.innerHTML = '';
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 3500);
+        }
+
+        // Init
+        updateCardDisplay();
+    </script>
+</body>
+</html>

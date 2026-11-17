@@ -1561,17 +1561,39 @@
                             deviceId: 'TERMINAL_KIOSK_01'
                         })
                     });
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        displayResult(true, `Name: ${data.data.userName} (${data.data.username})\nMethod: ${data.data.method.toUpperCase()}\nTime: ${new Date(data.data.timestamp).toLocaleString('id-ID')}\nStatus: Present`);
+                        showNotice('Attendance recorded!', 'success');
+                    } else {
+                        displayResult(false, data.message || 'Failed to record');
+                        showNotice(data.message || 'Verification failed', 'error');
+                    }
                 } else {
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    displayResult(true, `Name: ${data.data.userName} (${data.data.username})\nMethod: ${data.data.method.toUpperCase()}\nTime: ${new Date(data.data.timestamp).toLocaleString('id-ID')}\nStatus: Present`);
-                    showNotice('Attendance recorded!', 'success');
-                } else {
-                    displayResult(false, data.message || 'Failed to record');
-                    showNotice(data.message || 'Verification failed', 'error');
+                    // Manual record logic (use username + verification data)
+                    const response = await fetch('/api/attendance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: username,
+                            method: currentMethod,
+                            verificationData: verificationPayload,
+                            deviceId: 'TERMINAL_KIOSK_01'
+                        })
+                    });
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        displayResult(true, `Name: ${data.data.userName}\nTime: ${new Date().toLocaleString('id-ID')}\nStatus: Present`);
+                        showNotice('Attendance recorded!', 'success');
+                    } else {
+                        displayResult(false, data.message || 'Failed to record');
+                        showNotice(data.message || 'Verification failed', 'error');
+                    }
                 }
+
+
             } catch (err) {
                 console.error('Fetch error:', err);
                 displayResult(true, `(Offline Simulation)\nUsername: ${username}\nMethod: ${currentMethod.toUpperCase()}\nTime: ${new Date().toLocaleString('id-ID')}\nNote: Run "npm start" to save to MySQL.`);
